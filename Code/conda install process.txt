@@ -1,0 +1,13 @@
+# Instructions for setting up an environment in conda to run the sample code:
+
+create --name aima python=3.7
+install jupyter
+install keras
+install matplotlib
+install pandas
+install pillow
+install pytest
+install networkx
+install sortedcontainers
+install -c conda-forge opencv
+install -c omnia quadprog

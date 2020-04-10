@@ -1,0 +1,54 @@
+# time_slot.py: defines the TimeSlot class
+
+# -------------------------------------------------------------------------------------
+# create a class to represent a course time slot
+class TimeSlot():
+    def __init__(self, days, time_start, time_stop):
+        """ Construct a TimeSlot object"""
+        # days is a list of chars
+        # times should be ints (4 digits using military time)
+        # if isinstance(days, list):
+        self.days = days
+        # else:
+        #     self.days = [days]
+        self.start = time_start
+        self.stop = time_stop
+
+    def __repr__(self):
+        if len(self.days) == 1:
+            return "%s-%04d-%04d" % (self.days, self.start, self.stop)
+        else:
+            days_str = ''.join(self.days)
+            return "%s-%04d-%04d" % (days_str, self.start, self.stop)
+
+    def __eq__(self, other):
+        return (self.days == other.days) and (self.start == other.start) and (self.stop == other.stop)
+
+    def __ne__(self, other):
+        # this is not truly and != operator, but for the purposes of applying constraint_different_values() to a
+        # TimeSlot, what we want to know is if two time-slots overlap
+        return not self.overlaps(self, other)
+
+    def __lt__(self, other):
+        # define < so we can sort a set of TimeSlot variables
+        return self.__repr__() < other.__repr__()
+
+    def overlaps(self, ts):
+        # returns true if self overlaps with ts
+
+        # does the day overlap?
+        this_set = set(self.days)
+        ts_set = set(ts.days)
+        if not (this_set & ts_set):
+            return False
+
+        # does the time overlap? 3 cases to check
+        # does end time of ts land in (self.start, self.stop)
+        if ts.stop >= self.start and ts.stop <= self.stop:
+            return True
+        # does start time of ts land in (self.start, self.stop)
+        if ts.start >= self.start and ts.start <= self.stop:
+            return True
+        # does ts completly cover  (self.start, self.stop)
+        if ts.start <= self.start and ts.stop >= self.stop:
+            return True
