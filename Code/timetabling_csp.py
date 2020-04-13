@@ -23,14 +23,16 @@ class TimetablingCSP(csp.CSP):
 
     """
 
-    def __init__(self, variables, attr_names, domains, constraints):
+    def __init__(self, variables, attr_names, domains, constraints, curricula):
         """ Construct a TimetablingCSP problem."""
         self.variables = variables
         self.attr_names = attr_names
         self.domains = domains
         self.constraints = constraints
+        self.curricula = curricula
         self.curr_domains = None
         self.nassigns = 0
+        self.num_unassigns = 0
 
         # set up neighbors for all variables (it is all the other vars)
         all_var_names = list(self.variables.keys())
@@ -40,20 +42,19 @@ class TimetablingCSP(csp.CSP):
             neighbors.remove(v)
             self.neighbors[v] = neighbors
 
+    def fail_constraints(self, var1, val1, var2, val2):
+        for c in self.constraints:
+            # constraint functions return true if two variables satisfy the constraint
+            if not c(var1, val1, var2, val2, self.curricula):
+                return True
+        return False
+
     def nconflicts(self, var, val, assignment):
         """Return the number of conflicts var=val has with other variables."""
 
-        # assignment is a dictionary of {var:val} entries
-        def fail_constraints(var1, val1, var2, val2):
-            for c in self.constraints:
-                # constraint functions return true if two variables satisfy the constraint
-                if not c(var1, val1, var2, val2):
-                    return True
-            return False
-
         def conflict(var2):
             # fail = fail_constraints(var, val, var2, assignment[var2])
-            return var2 in assignment and fail_constraints(var, val, var2, assignment[var2])
+            return var2 in assignment and self.fail_constraints(var, val, var2, assignment[var2])
 
         num_conflicts = 0
         for v in self.neighbors[var]:
@@ -66,6 +67,14 @@ class TimetablingCSP(csp.CSP):
         """Add {var: val} to assignment; Discard the old value if any."""
         assignment[var] = val
         self.nassigns += 1
+
+    def unassign(self, var, assignment):
+        """Remove {var: val} from assignment.
+        DO NOT call this if you are changing a variable to a new value;
+        just call assign for that."""
+        if var in assignment:
+            del assignment[var]
+            self.num_unassigns += 1
 
     # These are for constraint propagation
     def support_pruning(self):

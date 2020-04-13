@@ -25,9 +25,7 @@ class TimeSlot():
         return (self.days == other.days) and (self.start == other.start) and (self.stop == other.stop)
 
     def __ne__(self, other):
-        # this is not truly and != operator, but for the purposes of applying constraint_different_values() to a
-        # TimeSlot, what we want to know is if two time-slots overlap
-        return not self.overlaps(self, other)
+        return (self.days != other.days) or (self.start != other.start) or (self.stop != other.stop)
 
     def __lt__(self, other):
         # define < so we can sort a set of TimeSlot variables

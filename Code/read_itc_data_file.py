@@ -117,7 +117,7 @@ def read_itc_data_file(file_name):
     for i in range(num_curricula):
         words = all_lines[curricula_section_start+i+1].split()
         # num_courses_in_curricula = int(words[1])
-        the_courses = [words[2:]]
+        the_courses = words[2:]
         curricula[words[0]] = the_courses
     # print('curricula:', curricula)
 
@@ -146,7 +146,7 @@ def read_itc_data_file(file_name):
             unavail_contraints[words[0]].append((int(words[1]), int(words[2])))
     print('unavail_contraints:', unavail_contraints)
 
-    return courses, rooms, num_days, periods_per_day, unavail_contraints
+    return courses, rooms, num_days, periods_per_day, unavail_contraints, curricula
 
 # -------------------------------------------------------------------------------------
 if __name__ == "__main__":
