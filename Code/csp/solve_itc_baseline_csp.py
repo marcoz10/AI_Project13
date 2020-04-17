@@ -14,12 +14,14 @@ import numpy as np
 import sys
 
 # *** set path to the AIMA code on your system ***
-sys.path.append("/users/brucks/source/aima")
+# sys.path.append("/users/brucks/source/aima")
+sys.path.append("../aima")
+sys.path.append("../utils")
 import csp
-import search
+# import search
 
 # import our code (in the same directory as this file)
-from csp_utils import forward_checking, constraint_different_values, constraint_different_timeslots, mac
+from csp_utils import forward_checking, constraint_different_values, constraint_different_timeslots
 from csp_utils import display_solution, display_solution_in_table
 from read_itc_data_file import read_itc_data_file
 from timetabling_csp import TimetablingCSP
@@ -101,7 +103,7 @@ def set_up_csp(file_name, verbose=False):
         for item in unavail_constraints[c]:
             day = item[0]
             time = item[1]
-            ts_number = day * num_days + time
+            ts_number = day * (num_days-1) + time
             blocked_timeslots[c].append(time_slots[ts_number])
 
     '''
@@ -292,7 +294,7 @@ def main_func(file_name):
 
 # -------------------------------------------------------------------------------------
 if __name__ == "__main__":
-    file_name = '../Data/ITC-2007/comp01.ctt.txt'
-    # file_name = '../Data/ITC-2007/toy_prob.ctt.txt'
+    file_name = '../../Data/ITC-2007/comp04.ctt.txt'
+    # file_name = '../../Data/ITC-2007/toy_prob.ctt.txt'
 
     main_func(file_name)

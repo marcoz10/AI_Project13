@@ -1,9 +1,6 @@
 # contains functions from AIMA csp.py that we need to over-ride so they work with our TimetablingCSP() class as well
 # as a few other odds and ends
 
-from operator import eq, neg
-from sortedcontainers import SortedSet
-
 # -------------------------------------------------------------------------------------
 # in general: a constraint function f(A, a, B, b) that returns true if two variables
 #             A, B satisfy the constraint when they have values A=a, B=b

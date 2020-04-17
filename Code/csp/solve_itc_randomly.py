@@ -11,8 +11,10 @@
 
 # import standard packages
 import numpy as np
+import sys
 
-# import our code (in the same directory as this file)
+# set the path and import our code
+sys.path.append("../utils")
 from csp_utils import display_solution, display_solution_in_table
 from solve_itc_baseline_csp import set_up_csp
 # from verify_solution import verify_solution
@@ -46,7 +48,7 @@ def main_func(file_name):
 
 # -------------------------------------------------------------------------------------
 if __name__ == "__main__":
-    file_name = '../Data/ITC-2007/comp01.ctt.txt'
-    # file_name = '../Data/ITC-2007/toy_prob.ctt.txt'
+    file_name = '../../Data/ITC-2007/comp01.ctt.txt'
+    # file_name = '../../Data/ITC-2007/toy_prob.ctt.txt'
 
     main_func(file_name)
