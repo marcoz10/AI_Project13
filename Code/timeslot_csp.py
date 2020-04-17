@@ -29,7 +29,14 @@ class TimeSlot():
 
     def __lt__(self, other):
         # define < so we can sort a set of TimeSlot variables
+        # if self.start == other.start:
+        #     self.stop < other.stop
+        # else:
+        #     self.start < other.start
         return self.__repr__() < other.__repr__()
+
+    def __hash__(self):
+        return hash(repr(self))
 
     def overlaps(self, ts):
         # returns true if self overlaps with ts
@@ -40,13 +47,22 @@ class TimeSlot():
         if not (this_set & ts_set):
             return False
 
-        # does the time overlap? 3 cases to check
-        # does end time of ts land in (self.start, self.stop)
-        if ts.stop >= self.start and ts.stop <= self.stop:
-            return True
-        # does start time of ts land in (self.start, self.stop)
-        if ts.start >= self.start and ts.start <= self.stop:
-            return True
-        # does ts completly cover  (self.start, self.stop)
-        if ts.start <= self.start and ts.stop >= self.stop:
-            return True
+        # these timelots do not overlap if
+        #   the other stops before this starts OR
+        #   the other starts after this ends
+        if ts.stop < self.start or ts.start > self.stop:
+            return False
+        return True
+
+        # # does the time overlap? 3 cases to check
+        # # does end time of ts land in (self.start, self.stop)
+        # if ts.stop >= self.start and ts.stop <= self.stop:
+        #     return True
+        # # does start time of ts land in (self.start, self.stop)
+        # if ts.start >= self.start and ts.start <= self.stop:
+        #     return True
+        # # does ts completly cover  (self.start, self.stop)
+        # if ts.start <= self.start and ts.stop >= self.stop:
+        #     return True
+        #
+        # return False

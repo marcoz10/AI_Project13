@@ -144,7 +144,7 @@ def read_itc_data_file(file_name):
             unavail_contraints[words[0]] = [(int(words[1]), int(words[2]))]
         else:
             unavail_contraints[words[0]].append((int(words[1]), int(words[2])))
-    print('unavail_contraints:', unavail_contraints)
+    # print('unavail_contraints:', unavail_contraints)
 
     return courses, rooms, num_days, periods_per_day, unavail_contraints, curricula
 

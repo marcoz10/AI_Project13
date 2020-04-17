@@ -2,7 +2,9 @@
 #                     to allow for non-atomic variables. This allows us to use the CSP solver / search algorithms from
 #                     the AIMA code base.
 #
+#
 
+# TODO:
 import csp
 
 from copy import deepcopy
@@ -23,10 +25,10 @@ class TimetablingCSP(csp.CSP):
 
     """
 
-    def __init__(self, variables, attr_names, domains, constraints, curricula):
+    def __init__(self, variables, domains, constraints, curricula):
         """ Construct a TimetablingCSP problem."""
         self.variables = variables
-        self.attr_names = attr_names
+        # self.attr_names = attr_names
         self.domains = domains
         self.constraints = constraints
         self.curricula = curricula
