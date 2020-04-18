@@ -1,6 +1,9 @@
 # contains functions from AIMA csp.py that we need to over-ride so they work with our TimetablingCSP() class as well
 # as a few other odds and ends
 
+# you may need to 'conda install tabulate' for this package (which makes a nice tabular printout)
+from tabulate import tabulate
+
 # -------------------------------------------------------------------------------------
 # in general: a constraint function f(A, a, B, b) that returns true if two variables
 #             A, B satisfy the constraint when they have values A=a, B=b
@@ -67,8 +70,11 @@ def display_solution(solution):
         print(t)
 
 # -------------------------------------------------------------------------------------
-def display_solution_in_table(solution, time_slots):
-    from tabulate import tabulate
+def display_solution_in_table(solution, time_slots, file_name=None):
+
+    if file_name:
+        file = open(file_name,'w')
+
     # let's just print headers and the time slots with a random string in each
     days = ['M','T','W','R','F']
     headers = ['Time'] + days
@@ -95,7 +101,9 @@ def display_solution_in_table(solution, time_slots):
             all_rooms.append(room)
 
     for r in all_rooms:
-        print('Schedule for room ', r)
+        print('Schedule for room %s\n' % (r))
+        if file_name:
+            file.write('Schedule for room %s\n' % (r))
 
         # now walk through the variable assignments in the solution and store the relevant elements of the solution in
         # a dictionary; key = time slot (string), value = list of len(days)
@@ -128,3 +136,10 @@ def display_solution_in_table(solution, time_slots):
             all_values.append(table_values[t])
 
         print(tabulate(all_values, headers=headers))
+        print('\n------------------------------------------------------\n')
+        if file_name:
+            file.write(tabulate(all_values, headers=headers))
+            file.write('\n------------------------------------------------------\n')
+
+    if file_name:
+        file.close()

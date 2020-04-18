@@ -17,10 +17,10 @@ import sys
 sys.path.append("../utils")
 from csp_utils import display_solution, display_solution_in_table
 from solve_itc_baseline_csp import set_up_csp
-# from verify_solution import verify_solution
+from verify_solution import verify_solution
 
 # -------------------------------------------------------------------------------------
-def main_func(file_name):
+def main_func(file_name, output_file=None):
 
     # Read in the ITC data file and do the pre-process necessary to convert the raw data into
     # variables, domains and constraints
@@ -28,6 +28,7 @@ def main_func(file_name):
 
     # -------------------------------------------------------------------------------------
     # generate a random solution, which should fail but will help for testing the verifier
+    # np.random.seed(0)
     solution = {}
     for v in variables:
         # randomly choose an assignment from this variable's domain
@@ -35,20 +36,22 @@ def main_func(file_name):
         solution[v] = domains[v][ind]
 
     if solution:
-        display_solution(solution)
-        display_solution_in_table(solution, time_slots)
+        # display_solution(solution)
+        display_solution_in_table(solution, time_slots, output_file)
     else:
         print('*** NO SOLUTION RETURNED ***')
 
     # run the verifier
-    # STILL IN PROGRESS
-    # solved, num_files = verify_solution(file_name, solution)
-
-
+    solved, solution_score = verify_solution(file_name, solution, verbose=True)
+    print('Solution Verified:', solved, ', score:',solution_score)
 
 # -------------------------------------------------------------------------------------
 if __name__ == "__main__":
-    file_name = '../../Data/ITC-2007/comp01.ctt.txt'
+    file_name = '../../Data/ITC-2007/comp03.ctt.txt'
     # file_name = '../../Data/ITC-2007/toy_prob.ctt.txt'
 
-    main_func(file_name)
+    # if you want to generate an output file of the schedule
+    # output_file = '/Users/brucks/Desktop/random_comp01.txt'
+    output_file = None  # if not
+
+    main_func(file_name, output_file)

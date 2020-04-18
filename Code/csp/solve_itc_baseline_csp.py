@@ -26,7 +26,7 @@ from csp_utils import display_solution, display_solution_in_table
 from read_itc_data_file import read_itc_data_file
 from timetabling_csp import TimetablingCSP
 from timeslot_csp import TimeSlot
-# from verify_solution import verify_solution
+from verify_solution import verify_solution
 
 
 # USE_ONE_DAY_CLASSES = True
@@ -222,20 +222,16 @@ def set_up_csp(file_name, verbose=False):
     # we have 2 constraints: 1) all variables have different assignments, 2) all courses in a curricula have
     # different time slots (even if they are in different rooms)
     constraints = [constraint_different_values, constraint_different_timeslots]
-    # constraints = [constraint_different_timeslots]
 
     return variables, domains, constraints, curricula, time_slots
 
 # -------------------------------------------------------------------------------------
-def main_func(file_name):
+def main_func(file_name, output_file=None):
 
     # Read in the ITC data file and do the pre-process necessary to convert the raw data into
     # variables, domains and constraints
     variables, domains, constraints, curricula, time_slots = set_up_csp(file_name)
 
-
-    # do something about the curricula constraints ... if 2 courses are in a curricula then they will have students
-    # in common and should not (or can not) be offered in the same timeslot (even if the room is different)
     # set up the problem
     my_problem = TimetablingCSP(variables, domains, constraints, curricula)
 
@@ -243,7 +239,7 @@ def main_func(file_name):
     # print('Solving with min_conflicts')
     # solution = csp.min_conflicts(my_problem, max_steps=100)
     # display_solution(solution)
-    # display_solution_in_table(solution, time_slots)
+    # display_solution_in_table(solution, time_slots, output_file)
     # print('--------------------------\n')
     # sys.exit()
 
@@ -262,8 +258,8 @@ def main_func(file_name):
                                        inference=csp.no_inference)
 
     if solution:
-        display_solution(solution)
-        display_solution_in_table(solution, time_slots)
+        # display_solution(solution)
+        display_solution_in_table(solution, time_slots, output_file)
     else:
         print('*** NO SOLUTION RETURNED ***')
 
@@ -289,12 +285,16 @@ def main_func(file_name):
     '''
 
     # run the verifier
-    # STILL IN PROGRESS
-    # verify_solution(file_name, solution)
+    solved, solution_score = verify_solution(file_name, solution, verbose=True)
+    print('Solution Verified:', solved, ', score:',solution_score)
 
 # -------------------------------------------------------------------------------------
 if __name__ == "__main__":
-    file_name = '../../Data/ITC-2007/comp04.ctt.txt'
+    file_name = '../../Data/ITC-2007/comp01.ctt.txt'
     # file_name = '../../Data/ITC-2007/toy_prob.ctt.txt'
 
-    main_func(file_name)
+    # if you want to generate an output file of the schedule
+    # output_file = '/Users/brucks/Desktop/baseline_comp01.txt'
+    output_file = None  # if not
+
+    main_func(file_name, output_file)
