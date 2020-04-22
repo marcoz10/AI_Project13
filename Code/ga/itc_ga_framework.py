@@ -4,6 +4,7 @@
 
 import sys
 from collections import deque
+from collections import OrderedDict 
 
 from utils import *
 
@@ -21,10 +22,11 @@ def genetic_search(problem, ngen=1000, pmut=0.1, n=20):
     return genetic_algorithm(states[:n], problem.value, ngen, pmut)
 
 
-def genetic_algorithm(population, fitness_fn, gene_pool=[0, 1], f_thres=None, ngen=1000, pmut=0.1):
+def genetic_algorithm(population, fitness_fn, domains,
+ f_thres=None, ngen=1000, pmut=0.1):
     """[Figure 4.8]"""
     for i in range(ngen):
-        population = [mutate(recombine(*select(2, population, fitness_fn)), gene_pool, pmut)
+        population = [mutate(recombine(*select(2, population, fitness_fn)), domains, pmut)
                       for i in range(len(population))]
 
         fittest_individual = fitness_threshold(fitness_fn, f_thres, population)
@@ -45,16 +47,19 @@ def fitness_threshold(fitness_fn, f_thres, population):
     return None
 
 
-def init_population(pop_number, gene_pool, state_length):
+def init_population(pop_number, variables, domains):
     """Initializes population for genetic algorithm
     pop_number  :  Number of individuals in population
     gene_pool   :  List of possible values for individuals
-    state_length:  The length of each individual"""
-    g = len(gene_pool)
+    """
     population = []
     for i in range(pop_number):
-        new_individual = [gene_pool[random.randrange(0, g)] for j in range(state_length)]
-        population.append(new_individual)
+        new_individual = {}
+        for v in variables:
+            # randomly choose an assignment from this variable's domain
+            ind = np.random.choice(len(domains[v]))
+            new_individual[v] = domains[v][ind]
+        population.append(OrderedDict(sorted(new_individual.items())) )
 
     return population
 
@@ -81,15 +86,13 @@ def recombine_uniform(x, y):
 
     return ''.join(str(r) for r in result)
 
-
-def mutate(x, gene_pool, pmut):
+def mutate(set_of_classes, domains, pmut):
     if random.uniform(0, 1) >= pmut:
         return x
 
-    n = len(x)
-    g = len(gene_pool)
-    c = random.randrange(0, n)
-    r = random.randrange(0, g)
+    course, timeandlocation = random.choice(list(d.items()))
+    
+    new_gene = random.choice(domains[course])
 
-    new_gene = gene_pool[r]
-    return x[:c] + [new_gene] + x[c + 1:]
+        # return the updated list of classes
+    return set_of_classes[:classes_to_change] + [new_gene] + set_of_classes[classes_to_change + 1:]
