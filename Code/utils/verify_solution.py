@@ -161,4 +161,6 @@ def verify_solution(file_name, solution, verbose=False):
 
     return total_score == 0, total_score
 
-
+def score_solution(solution, verbose=False):
+    passed, score = verify_solution('../../Data/ITC-2007/comp01.ctt.txt', solution, verbose)
+    return score
