@@ -232,9 +232,9 @@ def main_func(file_name, output_file=None):
     # variables, domains and constraints
     variables, domains, constraints, curricula, time_slots = set_up_csp(file_name)
     
-    population = init_population(1000, variables, domains)
+    population = init_population(100, variables, domains)
     
-    result = genetic_algorithm(population, score_solution, domains)
+    result = genetic_algorithm(population, score_solution, domains, ngen=50)
     print(result)
     
 
