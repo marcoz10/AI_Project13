@@ -5,6 +5,8 @@
 import sys
 from collections import deque
 from collections import OrderedDict 
+import numpy
+from itertools import islice, chain
 
 from utils import *
 
@@ -26,12 +28,14 @@ def genetic_algorithm(population, fitness_fn, domains,
  f_thres=None, ngen=1000, pmut=0.1):
     """[Figure 4.8]"""
     for i in range(ngen):
+        print('Generation '+str(i))
         population = [mutate(recombine(*select(2, population, fitness_fn)), domains, pmut)
                       for i in range(len(population))]
-
-        fittest_individual = fitness_threshold(fitness_fn, f_thres, population)
-        if fittest_individual:
-            return fittest_individual
+        
+        #Disable early end condition
+        #fittest_individual = fitness_threshold(fitness_fn, f_thres, population)
+        #if fittest_individual:
+        #    return fittest_individual
 
     return max(population, key=fitness_fn)
 
@@ -65,15 +69,24 @@ def init_population(pop_number, variables, domains):
 
 
 def select(r, population, fitness_fn):
-    fitnesses = map(fitness_fn, population)
-    sampler = weighted_sampler(population, fitnesses)
+    fitnesses = list(map(fitness_fn, population))
+    
+    #We need to normalize the fitness scores for the weighted_sampler function.
+    minFitness = min(fitnesses)
+    zeroAdjusted = list(map(lambda x : x + abs(minFitness), fitnesses)) 
+    normalFitnesses = zeroAdjusted/numpy.linalg.norm(zeroAdjusted)
+    
+    sampler = weighted_sampler(population, normalFitnesses)
     return [sampler() for i in range(r)]
 
 
 def recombine(x, y):
     n = len(x)
     c = random.randrange(0, n)
-    return x[:c] + y[c:]
+    return OrderedDict(
+        chain(
+            islice(x.items(), c),
+            islice(y.items(), c, len(y))))
 
 
 def recombine_uniform(x, y):
@@ -86,13 +99,20 @@ def recombine_uniform(x, y):
 
     return ''.join(str(r) for r in result)
 
-def mutate(set_of_classes, domains, pmut):
+def mutate(class_set, domains, pmut):
     if random.uniform(0, 1) >= pmut:
-        return x
-
-    course, timeandlocation = random.choice(list(d.items()))
+        return class_set
     
-    new_gene = random.choice(domains[course])
-
-        # return the updated list of classes
-    return set_of_classes[:classes_to_change] + [new_gene] + set_of_classes[classes_to_change + 1:]
+    class_index = random.randint(0, len(class_set)-1)
+    old_gene = list(class_set.items())[class_index]
+    class_name = old_gene[0]
+    new_gene = {class_name:random.choice(domains[class_name])}
+    
+    #print('Original: '+str(old_gene))
+    #print('Mutated: '+str(new_gene))
+    
+    return OrderedDict(
+        chain(
+            islice(class_set.items(), class_index),
+            new_gene.items(),
+            islice(class_set.items(), class_index + 1, len(class_set))))
