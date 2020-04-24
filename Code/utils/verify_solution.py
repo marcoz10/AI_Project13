@@ -73,7 +73,8 @@ def verify_solution(file_name, solution, verbose=False):
         if course_enrollment > room_capacity:
             num_fails += 1
             total_score -= HARD_CONSTRAINT_PENALTY
-            print('course ',s,': enrollment=',course_enrollment, ', assigned room=', assigned_room, ', capacity=', room_capacity)
+            if verbose:
+                print('course ',s,': enrollment=',course_enrollment, ', assigned room=', assigned_room, ', capacity=', room_capacity)
 
     if verbose:
         if num_fails > 0:
