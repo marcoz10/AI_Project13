@@ -27,24 +27,32 @@ def genetic_search(problem, ngen=1000, pmut=0.1, n=20):
 def genetic_algorithm(population, fitness_fn, domains,
  f_thres=None, ngen=1000, pmut=0.1):
     """[Figure 4.8]"""
+    stats = []
     for i in range(ngen):
-        print('Generation '+str(i))
+        fitness = list(map(fitness_fn, population))
+        stats.append({'generation':i,'mean':mean(fitness),'max':max(fitness),'min':min(fitness)})
+        print('Fitness Stats '+str(stats[-1]))
         population = [mutate(recombine(*select(2, population, fitness_fn)), domains, pmut)
                       for i in range(len(population))]
         
-        #Disable early end condition
-        #fittest_individual = fitness_threshold(fitness_fn, f_thres, population)
-        #if fittest_individual:
-        #    return fittest_individual
-
-    return max(population, key=fitness_fn)
+        fittest_individual = fitness_threshold(fitness_fn, f_thres, population)
+        if fittest_individual:
+            fitness = list(map(fitness_fn, population))
+            stats.append({'generation':i+1,'mean':mean(fitness),'max':max(fitness),'min':min(fitness)})
+            print('Fitness Stats '+str(stats[-1]))
+            return fittest_individual, stats
+    fitness = list(map(fitness_fn, population))
+    stats.append({'generation':i+1,'mean':mean(fitness),'max':max(fitness),'min':min(fitness)})
+    print('Fitness Stats '+str(stats[-1]))
+    return max(population, key=fitness_fn), stats
 
 
 def fitness_threshold(fitness_fn, f_thres, population):
-    if not f_thres:
+    if f_thres == None:
         return None
 
     fittest_individual = max(population, key=fitness_fn)
+    
     if fitness_fn(fittest_individual) >= f_thres:
         return fittest_individual
 
