@@ -10,8 +10,12 @@
 #   - csp, ga, utils, aima, misc ???
 
 # import standard packages
+from timeit import default_timer as timer
 import numpy as np
 import sys
+import os
+import matplotlib.pyplot as plt
+import pandas as pd
 
 # *** set path to the AIMA code on your system ***
 # sys.path.append("/users/brucks/source/aima")
@@ -228,19 +232,35 @@ def set_up_csp(file_name, verbose=False):
     return variables, domains, constraints, curricula, time_slots
 
 def main_func(file_name, output_file=None):
+    print ('Performing GA Analysis on '+file_name)
     # Read in the ITC data file and do the pre-process necessary to convert the raw data into
     # variables, domains and constraints
     variables, domains, constraints, curricula, time_slots = set_up_csp(file_name)
-    
+    start = timer()
     population = init_population(100, variables, domains)
-    
-    result = genetic_algorithm(population, score_solution, domains, ngen=50)
+    result, stats = genetic_algorithm(population, lambda x: score_solution(file_name, x), domains, ngen=100, f_thres=0)
+    end = timer()
+    print('GA took {:.1f} seconds'.format(end - start)) # Time in seconds, e.g. 5.38091952400282
     print(result)
-    
+    display_solution_in_table(result, time_slots, output_file)
+    df = pd.DataFrame(stats)
+    fig = plt.figure(1)
+    ax = plt.subplot(111)
+    ax.plot(df['generation'], df['max'], label='Maximum Fitness')
+    ax.plot(df['generation'], df['mean'], label='Mean Fitness')
+    ax.plot(df['generation'], df['min'], label='Minimum Fitness')
+    ax.legend(loc='lower right')
+    ax.set_ylabel('Fitness Score')
+    ax.set_xlabel('Generation')
+    plt.title("Generational Fitness in GA")
+    plt.show()
 
 # -------------------------------------------------------------------------------------
 if __name__ == "__main__":
-    file_name = '../../Data/ITC-2007/comp01.ctt.txt'
+    if len(sys.argv)==2 and os.path.exists(sys.argv[1]):
+        file_name = sys.argv[1]
+    else:
+        file_name = '../../Data/ITC-2007/comp01.ctt.txt'
     # file_name = '../../Data/ITC-2007/toy_prob.ctt.txt'
 
     # if you want to generate an output file of the schedule
