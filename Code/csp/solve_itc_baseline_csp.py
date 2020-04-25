@@ -12,6 +12,7 @@
 # import standard packages
 import numpy as np
 import sys
+import os
 
 # *** set path to the AIMA code on your system ***
 # sys.path.append("/users/brucks/source/aima")
@@ -290,7 +291,10 @@ def main_func(file_name, output_file=None):
 
 # -------------------------------------------------------------------------------------
 if __name__ == "__main__":
-    file_name = '../../Data/ITC-2007/comp01.ctt.txt'
+    if len(sys.argv)==2 and os.path.exists(sys.argv[1]):
+        file_name = sys.argv[1]
+    else:
+        file_name = '../../Data/ITC-2007/comp01.ctt.txt'
     # file_name = '../../Data/ITC-2007/toy_prob.ctt.txt'
 
     # if you want to generate an output file of the schedule
