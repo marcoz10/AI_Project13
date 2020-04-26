@@ -105,6 +105,10 @@ def set_up_csp(file_name, verbose=False):
             day = item[0]
             time = item[1]
             ts_number = day * (num_days-1) + time
+            # sometimes we have an issue when we are adjusting the problem to make it harder that we have blocked
+            # timeslots that refer to a day or time that is not in our set, so skip those
+            if ts_number >= len(time_slots):
+                continue
             blocked_timeslots[c].append(time_slots[ts_number])
 
     '''
@@ -294,7 +298,7 @@ if __name__ == "__main__":
     if len(sys.argv)==2 and os.path.exists(sys.argv[1]):
         file_name = sys.argv[1]
     else:
-        file_name = '../../Data/ITC-2007/comp01.ctt.txt'
+        file_name = '../../Data/ITC-2007/comp07-hard.ctt.txt'
     # file_name = '../../Data/ITC-2007/toy_prob.ctt.txt'
 
     # if you want to generate an output file of the schedule
