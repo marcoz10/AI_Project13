@@ -11,3 +11,4 @@ install networkx
 install sortedcontainers
 install -c conda-forge opencv
 install -c omnia quadprog
+install tabulate

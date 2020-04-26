@@ -13,13 +13,12 @@
 import numpy as np
 import sys
 import os
+from timeit import default_timer as timer
 
 # *** set path to the AIMA code on your system ***
-# sys.path.append("/users/brucks/source/aima")
 sys.path.append("../aima")
 sys.path.append("../utils")
 import csp
-# import search
 
 # import our code (in the same directory as this file)
 from csp_utils import forward_checking, constraint_different_values, constraint_different_timeslots
@@ -258,9 +257,11 @@ def main_func(file_name, output_file=None):
     #   inference = [no_inference, forward_checking, mac]
     #
     print('Solving with backtracking_search')
+    start = timer()
     solution = csp.backtracking_search(my_problem, select_unassigned_variable=csp.first_unassigned_variable,
                                        order_domain_values=csp.unordered_domain_values,
                                        inference=csp.no_inference)
+    end = timer()
 
     if solution:
         # display_solution(solution)
@@ -292,13 +293,14 @@ def main_func(file_name, output_file=None):
     # run the verifier
     solved, solution_score = verify_solution(file_name, solution, verbose=True)
     print('Solution Verified:', solved, ', score:',solution_score)
+    print('Solver time:', end - start)
 
 # -------------------------------------------------------------------------------------
 if __name__ == "__main__":
     if len(sys.argv)==2 and os.path.exists(sys.argv[1]):
         file_name = sys.argv[1]
     else:
-        file_name = '../../Data/ITC-2007/comp07-hard.ctt.txt'
+        file_name = '../../Data/ITC-2007/comp01.ctt.txt'
     # file_name = '../../Data/ITC-2007/toy_prob.ctt.txt'
 
     # if you want to generate an output file of the schedule
