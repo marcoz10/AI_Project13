@@ -213,14 +213,7 @@ def fitness_function (courses, rooms, curricula, solution, verbose=False):
         if value in assignments:
             total_score -= HARD_CONSTRAINT_PENALTY
         else:
-            assignments.add(value)
-            
-        #Code to check for curricula violations - that is, these courses can't be offered at the same time, even in different rooms
-        #Here we create a list of time assignments
-        #if time in times:
-        #    times[time].append(key)
-        #else:
-        #    times[time]=[key]
+            assignments.add(value)    
         
     for key, courses in curricula.items():
         num_courses = len(courses)
