@@ -73,7 +73,8 @@ def verify_solution(file_name, solution, verbose=False):
         if course_enrollment > room_capacity:
             num_fails += 1
             total_score -= HARD_CONSTRAINT_PENALTY
-            print('course ',s,': enrollment=',course_enrollment, ', assigned room=', assigned_room, ', capacity=', room_capacity)
+            if verbose:
+                print('course ',s,': enrollment=',course_enrollment, ', assigned room=', assigned_room, ', capacity=', room_capacity)
 
     if verbose:
         if num_fails > 0:
@@ -161,6 +162,89 @@ def verify_solution(file_name, solution, verbose=False):
 
     return total_score == 0, total_score
 
-def score_solution(solution, verbose=False):
-    passed, score = verify_solution('../../Data/ITC-2007/comp01.ctt.txt', solution, verbose)
+def score_solution(file_name, solution, verbose=False):
+    passed, score = verify_solution(file_name, solution, verbose)
     return score
+    
+def fitness_function (courses, rooms, curricula, solution, verbose=False):
+    """ Verifies / scores a solution to an Timetabling CSP problem
+        Note: if the 'solution' is not complete (not all variables are assigned) the returned score will be HARD_FAIL_SCORE
+
+    :param courses:  list fo courses
+    :param rooms:  list fo rooms
+    :param curricula:  list of curricula
+    :param solution:  a solution to the problem that is to be verified / scored
+    :param verbose:  flag indicating you want to see a bunch of info printed out
+    :return:  verified (bool): True indicates that the solution meets all contraints
+              num_fails (int): The number of failures in the solution
+    """
+    
+    # Need to verify the provide solution based on the input data. These are done and mostly tested:
+    # - check that all courses have an assignment
+    # - check that all courses are assigned to rooms with adequate capacity
+    # - check that no room-timeslot combination has more than once course assigned
+
+    # These still need to be done:
+    # - a solution contains only one assignment for each course
+    # - unavailability constraints
+    total_score = 0
+    #Code to check for underassignment of classes
+    if len(solution) != len(courses):
+        return HARD_FAIL_SCORE
+        
+    classes=set()
+    assignments=set()
+    for key, value in solution.items():
+        #Code to check for overassignment of classes
+        if key in classes:
+            return HARD_FAIL_SCORE
+        else:
+            classes.add(key)
+        
+        #Code to check for classroom size violations
+        room = value[0]
+        time = value[1]
+        capacity = rooms[room]
+        enrollment = courses[key][3]
+        if enrollment > capacity:
+            total_score -= HARD_CONSTRAINT_PENALTY
+        
+        #Code to check for overassignment of room-timeslot combinations
+        if value in assignments:
+            total_score -= HARD_CONSTRAINT_PENALTY
+        else:
+            assignments.add(value)
+            
+        #Code to check for curricula violations - that is, these courses can't be offered at the same time, even in different rooms
+        #Here we create a list of time assignments
+        #if time in times:
+        #    times[time].append(key)
+        #else:
+        #    times[time]=[key]
+        
+    for key, courses in curricula.items():
+        num_courses = len(courses)
+        for i in range(0,num_courses):
+            for j in range(i+1, num_courses):
+                a1 = solution[courses[i]]
+                a2 = solution[courses[j]]
+                if a1[0] != a2[0] or not a1[1].overlaps(a2[1]):
+                    # different room
+                    continue
+                elif not a1[1].overlaps(a2[1]):
+                    # same room but times do not overlap
+                    continue
+                else:
+                    total_score -= SOFT_CONSTRAINT_PENALTY
+                    
+#    for key, curriculum in curricula.items():
+#        times = set()
+#        for course in curriculum:
+#            time = solution[course][1]
+#            if time in times:
+#                total_score -= SOFT_CONSTRAINT_PENALTY
+#            else:
+#                times.add(time)
+        
+     
+    return total_score
