@@ -29,34 +29,24 @@ def genetic_algorithm(population, fitness_fn, domains,
     """[Figure 4.8]"""
     stats = []
     for i in range(ngen):
-        fitness = list(map(fitness_fn, population))
-        stats.append({'generation':i,'mean':mean(fitness),'max':max(fitness),'min':min(fitness)})
+        fitnesses = list(map(fitness_fn, population))
+        maxfit=max(fitnesses)
+        stats.append({'generation':i,'mean':mean(fitnesses),'max':maxfit,'min':min(fitnesses)})
         print('Fitness Stats '+str(stats[-1]))
-        population = [mutate(recombine(*select(2, population, fitness_fn)), domains, pmut)
-                      for i in range(len(population))]
         
-        fittest_individual = fitness_threshold(fitness_fn, f_thres, population)
-        if fittest_individual:
-            fitness = list(map(fitness_fn, population))
-            stats.append({'generation':i+1,'mean':mean(fitness),'max':max(fitness),'min':min(fitness)})
-            print('Fitness Stats '+str(stats[-1]))
-            return fittest_individual, stats
+        if f_thres != None and maxfit >= f_thres:
+            return population[fitnesses.index(maxfit)], stats
+        
+        population = [mutate(recombine(*select(2, population, fitnesses)), domains, pmut)
+                      for i in range(len(population))]
+
+    #Log final generation's stats
     fitness = list(map(fitness_fn, population))
+    maxfitness=max(fitness)
     stats.append({'generation':i+1,'mean':mean(fitness),'max':max(fitness),'min':min(fitness)})
     print('Fitness Stats '+str(stats[-1]))
-    return max(population, key=fitness_fn), stats
-
-
-def fitness_threshold(fitness_fn, f_thres, population):
-    if f_thres == None:
-        return None
-
-    fittest_individual = max(population, key=fitness_fn)
     
-    if fitness_fn(fittest_individual) >= f_thres:
-        return fittest_individual
-
-    return None
+    return population[fitness.index(maxfitness)], stats
 
 
 def init_population(pop_number, variables, domains):
@@ -76,8 +66,7 @@ def init_population(pop_number, variables, domains):
     return population
 
 
-def select(r, population, fitness_fn):
-    fitnesses = list(map(fitness_fn, population))
+def select(r, population, fitnesses):
     
     #We need to normalize the fitness scores for the weighted_sampler function.
     minFitness = min(fitnesses)

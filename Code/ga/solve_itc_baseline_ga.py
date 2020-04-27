@@ -84,8 +84,8 @@ def main_func(file_name, output_file=None):
     variables, domains, constraints, curricula, time_slots = set_up_csp(file_name)
     courses, rooms, num_days, periods_per_day, unavail_constraints, curricula = read_itc_data_file(file_name)
     
-    N_Individuals=300
-    N_Generations=250
+    N_Individuals=1000
+    N_Generations=1000
     P_Mutation=.1
     
     population = init_population(N_Individuals, variables, domains)
