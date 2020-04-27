@@ -66,7 +66,7 @@ list(map(lambda x: fitness_function(courses, rooms, curricula, x), population))'
     
     variables, domains, constraints, curricula, time_slots = set_up_csp(file_name)
     courses, rooms, num_days, periods_per_day, unavail_constraints, curricula = read_itc_data_file(file_name)
-    population = init_population(100, variables, domains)
+    population = init_population(200, variables, domains)
     
     fitnessOld = list(map(lambda x: score_solution(file_name, x), population))
     print(sum(fitnessOld))
@@ -84,10 +84,14 @@ def main_func(file_name, output_file=None):
     variables, domains, constraints, curricula, time_slots = set_up_csp(file_name)
     courses, rooms, num_days, periods_per_day, unavail_constraints, curricula = read_itc_data_file(file_name)
     
-    population = init_population(100, variables, domains)
+    N_Individuals=300
+    N_Generations=250
+    P_Mutation=.1
+    
+    population = init_population(N_Individuals, variables, domains)
     
     start = timer()
-    result, stats = genetic_algorithm(population, lambda x: fitness_function(courses, rooms, curricula, x), domains, ngen=100, f_thres=0)
+    result, stats = genetic_algorithm(population, lambda x: fitness_function(courses, rooms, curricula, x), domains, ngen=N_Generations, f_thres=0, pmut=P_Mutation)
     end = timer()
     print('GA took {:.1f} seconds'.format(end - start)) # Time in seconds, e.g. 5.38091952400282
 
@@ -96,13 +100,13 @@ def main_func(file_name, output_file=None):
     df = pd.DataFrame(stats)
     fig = plt.figure(1)
     ax = plt.subplot(111)
-    ax.plot(df['generation'], df['max'], label='Maximum Fitness')
-    ax.plot(df['generation'], df['mean'], label='Mean Fitness')
-    ax.plot(df['generation'], df['min'], label='Minimum Fitness')
+    ax.plot(df['generation'], df['max'], label='Maximum Fitness', color='#021E48')
+    ax.plot(df['generation'], df['mean'], label='Mean Fitness', color='#B8CDFF')
+    ax.plot(df['generation'], df['min'], label='Minimum Fitness', color='#BFBFBF')
     ax.legend(loc='lower right')
     ax.set_ylabel('Fitness Score')
     ax.set_xlabel('Generation')
-    plt.title("Generational Fitness in GA")
+    plt.title("Generational Fitness in GA with "+str(N_Individuals)+" Individuals")
     plt.show()
 
 # -------------------------------------------------------------------------------------

@@ -81,8 +81,12 @@ def select(r, population, fitness_fn):
     
     #We need to normalize the fitness scores for the weighted_sampler function.
     minFitness = min(fitnesses)
-    zeroAdjusted = list(map(lambda x : x + abs(minFitness), fitnesses)) 
-    normalFitnesses = zeroAdjusted/numpy.linalg.norm(zeroAdjusted)
+    zeroAdjusted = list(map(lambda x : x + abs(minFitness), fitnesses))
+    normalizationFactor = numpy.linalg.norm(zeroAdjusted)
+    if normalizationFactor == 0:
+        normalFitnesses = zeroAdjusted
+    else:
+        normalFitnesses = zeroAdjusted/normalizationFactor
     
     sampler = weighted_sampler(population, normalFitnesses)
     return [sampler() for i in range(r)]
