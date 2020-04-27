@@ -4,6 +4,7 @@
 # you may need to 'conda install tabulate' for this package (which makes a nice tabular printout)
 from tabulate import tabulate
 
+import csp
 # -------------------------------------------------------------------------------------
 # in general: a constraint function f(A, a, B, b) that returns true if two variables
 #             A, B satisfy the constraint when they have values A=a, B=b
@@ -49,8 +50,50 @@ def forward_checking(csp, var, value, assignment, removals):
                 return False
     return True
 
+
 # -------------------------------------------------------------------------------------
-def display_solution(solution):
+# backtracking_search: so I can mess with the function and try to assess how well it does ...
+def backtracking_search(csp, select_unassigned_variable=csp.first_unassigned_variable,
+                        order_domain_values=csp.unordered_domain_values, inference=csp.no_inference):
+    """[Figure 6.5]"""
+
+    def backtrack(assignment, count=0):
+        if len(assignment) == len(csp.variables):
+            print('count:', count)
+            return assignment
+        var = select_unassigned_variable(assignment, csp)
+        for value in order_domain_values(var, assignment, csp):
+            if 0 == csp.nconflicts(var, value, assignment):
+                csp.assign(var, value, assignment)
+                removals = csp.suppose(var, value)
+                if inference(csp, var, value, assignment, removals):
+                    result = backtrack(assignment, count+1)
+                    if result is not None:
+                        return result
+                csp.restore(removals)
+        csp.unassign(var, assignment)
+        return None
+
+    result = backtrack({})
+    assert result is None or csp.goal_test(result)
+    return result
+
+# -------------------------------------------------------------------------------------
+def display_solution(solution, file_name=None):
+
+    if file_name:
+        file = open(file_name,'w')
+        file.write('Course Code, Room, Days, Start Time, End Time\n')
+        for s in solution:
+            room = solution[s][0]
+            ts = solution[s][1]
+            start = ts.start
+            stop = ts.stop
+            days = ''.join(ts.days)
+            file.write('%s,%s,%s,%04d,%04d\n' % (s, room, days, start, stop))
+        file.close()
+
+
     # for a first cut, let's just print it out day by day ...
     # print('solution:', solution)
 
@@ -68,6 +111,7 @@ def display_solution(solution):
     time_slots.sort(key=lambda x: x[0])
     for t in time_slots:
         print(t)
+
 
 # -------------------------------------------------------------------------------------
 def display_solution_in_table(solution, time_slots, file_name=None):
